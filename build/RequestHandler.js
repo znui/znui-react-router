@@ -32,7 +32,21 @@ module.exports = zn.Class({
       }
     },
     loadPlugins: function loadPlugins(plugins) {
-      plugins.forEach(function (plugin) {});
+      var _plugins = plugins || [];
+
+      switch (zn.type(plugins)) {
+        case 'string':
+          _plugins = [plugins];
+          break;
+
+        case 'function':
+          _plugins = plugins(this);
+          break;
+      }
+
+      if (_plugins && _plugins.length) {
+        plugins.forEach(function (plugin) {});
+      }
     },
     loadPlugin: function loadPlugin() {},
     loadRoutes: function loadRoutes(routes) {

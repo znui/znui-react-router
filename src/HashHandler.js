@@ -3,7 +3,11 @@ module.exports = zn.Class(RequestHandler, {
     events: ['hashchange', 'handler'],
     methods: {
         init: function (argv, events){
-            this.super(argv);
+            if(this.super.caller) {
+                this.super(argv);
+            }else{
+                this.constructor._super_.prototype.init(argv);
+            }
             this.__initEvents(events || {});
             if(argv.main && !location.hash){
                 location.hash = argv.main;
