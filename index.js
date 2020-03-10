@@ -1,10 +1,13 @@
-require('./dist/index.style.css')
+require('znui-react');
 if(process && process.env && process.env.NODE_ENV) {
     if(process.env.NODE_ENV == 'development') {
-        module.exports = require('./build/index.js');
+        require('./__/dist/development/index.style.bundle.css');
+        module.exports = require('./__/build/index');
     }else{
-        module.exports = require('./dist/index.js');
+        require('./__/dist/production/index.style.bundle.css');
+        module.exports = require('./__/dist/production/index.bundle.js');
     }
 }else {
-    module.exports = require('./dist/index.js');
+    require('./__/dist/production/index.style.bundle.css');
+    module.exports = require('./__/dist/production/index.bundle.js');
 }

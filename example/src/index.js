@@ -1,10 +1,10 @@
 require('znui-react');
-require('../src/index.less');
+require('../../src/index.less');
 require('./index.less');
 var React = znui.React || require('react');
-var ReactDOM = znui.ReactDOM || require('react-dom');
-var router = require('../src/index.js');
-
+var router = require('../../src/index');
+console.log(router, znui);
+console.log(router, znui);
 var _config = {
     main: '/a/a4',
     plugins: ['znui-react'],
