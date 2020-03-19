@@ -22,7 +22,12 @@ var ZRRoute = React.createClass({
       return {
         Component: _route.component,
         ComponentProps: zn.extend({}, _route.props, {
+          application: this.props.application,
+          config: this.props.config,
+          parent: this,
+          parentRequest: _request,
           route: _route,
+          router: this.props.router,
           request: _newRequest
         })
       };
@@ -30,6 +35,11 @@ var ZRRoute = React.createClass({
       return {
         Component: error.Error404,
         ComponentProps: {
+          application: this.props.application,
+          config: this.props.config,
+          parent: this,
+          parentRequest: _request,
+          router: this.props.router,
           request: _newRequest
         }
       };

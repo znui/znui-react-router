@@ -30,18 +30,30 @@ module.exports = React.createClass({
 		this.setState({
 			Component: route.component,
 			ComponentProps: zn.extend({}, route.props, {
+				application: this.props.application,
+				config: this.props.application._config,
 				request: request,
+				router: this,
 				route: route
 			})
 		});
 	},
-	__notfound: function (sender, request){
+	push: function (){
+
+	},
+	forward: function (){
+
+	},
+	notfound: function (request){
 		this.setState({
 			Component: error.Error404,
 			ComponentProps: {
 				request: request
 			}
 		});
+	},
+	__notfound: function (sender, request){
+		this.notfound(request);
 	},
 	render: function(){
 		return (

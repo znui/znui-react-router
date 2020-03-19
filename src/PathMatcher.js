@@ -48,7 +48,7 @@ module.exports = zn.Class({
             return request.params = _data, _route;
         },
         __isReactComponent: function (component){
-            if(component && zn.is(component, 'function') && component.prototype.render && component.displayName) {
+            if(component && zn.is(component, 'function') && (component.prototype.render || component.displayName)) {
                 return true;
             }
 
@@ -60,7 +60,7 @@ module.exports = zn.Class({
                 _route.component = zn.path(window, component);
             } else if(zn.is(component, 'function')){
                 if(!this.__isReactComponent(component)) {
-                    _route.component = component.call(this, key);
+                    _route.component = component.call(this, path, this);
                 }else{
                     _route.component = component;
                 }
@@ -79,6 +79,12 @@ module.exports = zn.Class({
                 _hasChecked = false,
                 _temp = null,
                 _temps = request.path.split(this._pathSeparator);
+
+            if(route.routes && Object.keys(route.routes).length) {
+                if(route.exact == null) {
+                    route.exact = false;
+                }
+            }
 
             if(route.exact) {
                 if(route.path === request.path) {

@@ -4,6 +4,9 @@
 example/*
 node_modules/*
 src/*
+example/*
+__/development.js
+__/production.js
 .babelrc
 .gitignore
 .npmignore
