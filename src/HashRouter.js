@@ -31,7 +31,7 @@ module.exports = React.createClass({
 			Component: route.component,
 			ComponentProps: zn.extend({}, route.props, {
 				application: this.props.application,
-				config: this.props.application._config,
+				config: (this.props.application||{})._config,
 				request: request,
 				router: this,
 				route: route
