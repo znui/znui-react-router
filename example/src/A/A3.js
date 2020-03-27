@@ -4,7 +4,10 @@ module.exports = React.createClass({
 	render: function(){
 		return (
 			<div style={{width: 100, height: 50, lineHeight: 50, backgroundColor: 'yellow'}} >
-				A3
+				<div>A3</div>
+				<div>Search: {JSON.stringify(this.props.request.search)}</div>
+				<div>Params: {JSON.stringify(this.props.request.params)}</div>
+				<div>Unmatchs: {JSON.stringify(this.props.request.unmatchs)}</div>
 			</div>
 		);
 	}

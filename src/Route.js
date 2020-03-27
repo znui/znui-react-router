@@ -11,16 +11,21 @@ var ZRRoute = React.createClass({
 				event: _request.event,
 				matcher: _matcher
 			},
-			_routes = _matcher.formatRoutes(this.__mergeRoutesAndPlugins(this.props.route.routes, this.props.route.plugins)),
-			_route = _matcher.getRouteForRequest(_newRequest, _routes);
+			_routes = this.props.route.__routes__,
+			_route = null,
+			_component = null;
+        if(!_routes) {
+			var _fRoute = _matcher.getRoutesFromRoute(this.props.route);
+			_routes = _fRoute.routes;
+			_component = _fRoute.component;
+		}
+		_route = _matcher.getRouteForRequest(_newRequest, _routes);
 
-		
 		if(_route) {
 			return {
-				Component: _route.component,
+				Component: _route.component || _component,
 				ComponentProps: zn.extend({}, _route.props, {
 					application: this.props.application,
-					config: this.props.config,
 					parent: this,
 					parentRequest: _request,
 					route: _route,
@@ -33,7 +38,6 @@ var ZRRoute = React.createClass({
 				Component: error.Error404,
 				ComponentProps: {
 					application: this.props.application,
-					config: this.props.config,
 					parent: this,
 					parentRequest: _request,
 					router: this.props.router,
@@ -42,9 +46,6 @@ var ZRRoute = React.createClass({
 			}
 		}
 		
-	},
-	__mergeRoutesAndPlugins: function (routes, plugins) {
-		return routes;
 	},
 	__getComponent: function (){
 		return this.__handler();

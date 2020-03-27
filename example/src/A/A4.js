@@ -6,7 +6,8 @@ module.exports = React.createClass({
 			<div style={{backgroundColor: 'green'}} >
 				<div>A4</div>
 				<div>Search: {JSON.stringify(this.props.request.search)}</div>
-				<div>Params: {JSON.stringify(this.props.params)}</div>
+				<div>Params: {JSON.stringify(this.props.request.params)}</div>
+				<div>Unmatchs: {JSON.stringify(this.props.request.unmatchs)}</div>
 			</div>
 		);
 	}

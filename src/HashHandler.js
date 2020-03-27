@@ -1,24 +1,28 @@
 var RequestHandler = require('./RequestHandler');
 module.exports = zn.Class(RequestHandler, {
     events: ['hashchange', 'handler'],
+    properties: { },
     methods: {
         init: function (argv, events){
+            this.__initEvents(events);
             if(this.super.caller) {
                 this.super(argv);
             }else{
-                this.constructor._super_.prototype.init(argv);
+                this.constructor._super_.prototype.init(argv, events);
             }
-            this.__initEvents(events || {});
-            if(argv.main && !location.hash){
-                location.hash = argv.main;
+
+            if(this._main.length && !location.hash){
+                location.hash = this._main.pop();
             }else{
                 this.__hashchange();
             }
             window.addEventListener('hashchange', this.__hashchange.bind(this), false);
         },
         __initEvents: function (events){
-            for(var event in events){
-                this.on(event, events[event], this);
+            if(events && typeof events == 'object'){
+                for(var event in events){
+                    this.on(event, events[event], this);
+                }
             }
         },
         __hashchange: function (event){

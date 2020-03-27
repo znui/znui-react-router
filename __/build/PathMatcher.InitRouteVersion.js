@@ -3,7 +3,7 @@
 function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
 
 module.exports = zn.Class({
-  events: ['pluginLoading', 'pluginLoaded', 'routeLoading', 'routeLoaded'],
+  events: ['pluginLoaded', 'routeLoaded'],
   properties: {
     pathSeparator: null,
     pathParameterSymbol: null
@@ -23,12 +23,6 @@ module.exports = zn.Class({
       }
     },
     formatRoute: function formatRoute(route, parent) {
-      var _return = this.fire('routeLoading', route, parent);
-
-      if (_return === false) {
-        return;
-      }
-
       if (parent) {
         route.__parent__ = parent;
       }
@@ -36,33 +30,31 @@ module.exports = zn.Class({
       route.paths = this.__parseRoutePaths(route.path);
       route.props = zn.extend({}, route.props);
 
-      if (route.exact == null && route.path.indexOf(this._pathParameterSymbol) === -1) {
+      if (route.exact == null) {
         route.exact = true;
       }
 
-      return this.fire('routeLoaded', route), route;
+      this.fire('routeLoaded', route);
+      return route;
     },
     formatRoutes: function formatRoutes(routes, parent) {
       var _this = this;
 
-      switch (zn.type(routes)) {
-        case 'object':
-          var _routes = [];
+      var _routes = [];
 
-          for (var path in routes) {
-            _routes.push(this.__loadPathAndComponent(path, routes[path], parent));
-          }
-
-          return _routes;
-
-        case 'array':
-          return routes.map(function (route) {
-            return _this.formatRoute(route, parent);
-          });
-
-        case 'function':
-          return this.formatRoutes(routes.call(null, parent, this), parent);
+      if (zn.is(routes, 'object')) {
+        for (var path in routes) {
+          _routes.push(this.__loadPathAndComponent(path, routes[path], parent));
+        }
+      } else if (zn.is(routes, 'array')) {
+        return routes.map(function (route) {
+          return _this.formatRoute(route, parent);
+        });
+      } else if (zn.is(routes, 'function')) {
+        return this.formatRoutes(routes.call(this));
       }
+
+      return _routes;
     },
     getRouteForRequest: function getRouteForRequest(request, routes) {
       var _routes = routes,
@@ -84,31 +76,8 @@ module.exports = zn.Class({
 
       return request.params = _data, _route;
     },
-    getRoutesFromRoute: function getRoutesFromRoute(route) {
-      var _routes = [],
-          _component = route.component;
-
-      if (route.routes) {
-        _routes = this.formatRoutes(route.routes, route);
-      }
-
-      if (route.plugins) {
-        var _plugins = this.__loadPlugins(route.plugins, route);
-
-        _routes = _routes.concat(_plugins.routes);
-
-        if (!_component && _plugins.main.length) {
-          _component = _plugins.main.pop();
-        }
-      }
-
-      return {
-        routes: _routes,
-        component: _component
-      };
-    },
     __isReactComponent: function __isReactComponent(component) {
-      if (component && zn.is(component, 'function') && (component.prototype.render || component.displayName || component.prototype.isReactComponent)) {
+      if (component && zn.is(component, 'function') && (component.prototype.render || component.displayName)) {
         return true;
       }
 
@@ -119,28 +88,18 @@ module.exports = zn.Class({
         path: path
       };
 
-      switch (zn.type(component)) {
-        case 'string':
-          _route.component = zn.path(window, component);
-          break;
+      if (zn.is(component, 'string')) {
+        _route.component = zn.path(window, component);
+      } else if (zn.is(component, 'function')) {
+        if (!this.__isReactComponent(component)) {
+          _route.component = component.call(this, path, this);
+        } else {
+          _route.component = component;
+        }
+      } else if (zn.is(component, 'object')) {
+        zn.extend(_route, component);
 
-        case 'function':
-          if (!this.__isReactComponent(component)) {
-            _route.component = component.call(this, path, this);
-          } else {
-            _route.component = component;
-          }
-
-          break;
-
-        case 'object':
-          zn.extend(_route, component);
-
-          if (_route.extension) {
-            this.__initRoute(_route);
-          }
-
-          break;
+        this.__initRoute(_route);
       }
 
       return this.formatRoute(_route, parent);
@@ -153,20 +112,18 @@ module.exports = zn.Class({
       if (route.plugins) {
         var _plugins = this.__loadPlugins(route.plugins, route);
 
+        route.main = _plugins.main;
+
         if (route.__routes__) {
           route.__routes__ = route.__routes__.concat(_plugins.routes);
         } else {
           route.__routes__ = _plugins.routes;
         }
 
-        route.main = _plugins.main;
-
         if (!route.component && _plugins.main.length) {
           route.component = _plugins.main.pop();
         }
       }
-
-      return route;
     },
     __loadPlugins: function __loadPlugins(plugins, parent) {
       var _plugins = plugins || [],
@@ -194,7 +151,7 @@ module.exports = zn.Class({
             }
 
             if (_plugin.main) {
-              _main.push(_plugin.routes[_plugin.main]);
+              _main.push(_plugin.main);
             }
           }
         }.bind(this));
@@ -206,12 +163,7 @@ module.exports = zn.Class({
       };
     },
     __loadPlugin: function __loadPlugin(plugin, parent) {
-      var _plugin = plugin || {},
-          _return = this.fire('pluginLoading', plugin, parent);
-
-      if (_return === false) {
-        return;
-      }
+      var _plugin = plugin || {};
 
       switch (zn.type(plugin)) {
         case 'object':

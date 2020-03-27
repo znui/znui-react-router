@@ -13,30 +13,39 @@ module.exports = React.createClass({
 		this.__initHandler();
 	},
 	__initHandler: function (){
-		new HashHandler(this.props, {
+		this._handler = new HashHandler(this.props, {
 			hashchange: this.__hashchange,
 			handler: this.__handler,
 			request: this.__request,
-			notfound: this.__notfound
+			notfound: this.__notfound,
+			pluginloaded: this.__pluginLoaded
 		});
+		this.props.onInitHandler && this.props.onInitHandler(this._handler, this);
 	},
 	__hashchange: function (sender, event){
-		
+		this.props.onHashChange && this.props.onHashChange(event, this);
 	},
 	__handler: function (sender, event, data){
-		
+		this.props.onHandler && this.props.onHandler(event, data, this);
 	},
 	__request: function (sender, request, route){
 		this.setState({
 			Component: route.component,
 			ComponentProps: zn.extend({}, route.props, {
 				application: this.props.application,
-				config: (this.props.application||{})._config,
 				request: request,
 				router: this,
 				route: route
 			})
 		});
+		this.props.onRequest && this.props.onRequest(request, route, this);
+	},
+	__notfound: function (sender, request){
+		this.notfound(request);
+		this.props.onNotFound && this.props.onNotFound(request, this);
+	},
+	__pluginLoaded: function (sender, data){
+		this.props.onPluginLoaded && this.props.onPluginLoaded(data, this);
 	},
 	push: function (){
 
@@ -51,9 +60,6 @@ module.exports = React.createClass({
 				request: request
 			}
 		});
-	},
-	__notfound: function (sender, request){
-		this.notfound(request);
 	},
 	render: function(){
 		return (

@@ -1,5 +1,5 @@
 var React = znui.React || require('react');
-var Route = require('../../../../src/Route');
+var Route = require('../../../src/index').Route;
 module.exports = React.createClass({
 	displayName:'A2.1',
 	render: function(){
