@@ -106,7 +106,7 @@ module.exports = zn.Class({
                     break;
                 case 'object':
                     zn.extend(_route, component);
-                    if(_route.extension){
+                    if(_route.extension !== false){
                         this.__initRoute(_route);
                     }
                     break;
@@ -139,7 +139,8 @@ module.exports = zn.Class({
             var _plugins = plugins || [],
                 _plugin = null,
                 _routes = [],
-                _main = [];
+                _main = [],
+                _pluginMain = null;
             switch(zn.type(plugins)){
                 case 'object':
                     _plugins = [plugins];
@@ -156,7 +157,21 @@ module.exports = zn.Class({
                             _routes = _routes.concat(_plugin.__routes__);
                         }
                         if(_plugin.main) {
-                            _main.push(_plugin.routes[_plugin.main]);
+                            _pluginMain = _plugin.main;
+                            switch(zn.type(_main)){
+                                case 'string':
+                                    _pluginMain = _plugin.routes[_pluginMain] || zn.path(_plugin.components, _pluginMain) || zn.path(window, _pluginMain);
+                                    break;
+                                case 'function':
+                                    if(_pluginMain.constructor.toString() == "function Function() { [native code] }"){
+                                        _pluginMain = _pluginMain(this);
+                                    }
+                                    break;
+                                default :
+                                    return;
+                            }
+
+                            _main.push(_pluginMain);
                         }
                     }
                 }.bind(this));
