@@ -134,10 +134,14 @@ module.exports = zn.Class({
           break;
 
         case 'object':
-          zn.extend(_route, component);
+          if (component.$$typeof) {
+            _route.component = component;
+          } else if (component.constructor.toString() == 'function Object() { [native code] }') {
+            zn.extend(_route, component);
 
-          if (_route.extension !== false) {
-            this.__initRoute(_route);
+            if (_route.extension !== false) {
+              this.__initRoute(_route);
+            }
           }
 
           break;

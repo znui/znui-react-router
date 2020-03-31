@@ -1,15 +1,18 @@
 var PathMatcher = require('./PathMatcher');
 module.exports = zn.Class({
-    events: ['request', 'notfound', 'pluginLoaded'],
+    events: ['request', 'notfound', 'pluginLoading', 'pluginLoaded'],
     properties: {
         requests: null,
         routes: null,
-        main: null
+        plugins: null,
+        main: null,
+        matcher: null
     },
     methods: {
         init: function (argv, events){
             this._requests = [];
             this._routes = [];
+            this._plugins = [];
             this._main = [];
             this._matcher = new PathMatcher(argv, {
                 pluginLoaded: function (sender, plugin) {
@@ -61,7 +64,11 @@ module.exports = zn.Class({
             return this;
         },
         loadPlugin: function (plugin){
-            var _plugin = plugin || {};
+            var _plugin = plugin || {},
+                _return = this.fire('pluginLoading', plugin);
+            if(_return === false){
+                return;
+            }
             switch(zn.type(plugin)){
                 case 'object':
                     _plugin = _plugin;
@@ -74,8 +81,12 @@ module.exports = zn.Class({
             if(_plugin.main) {
                 this._main.push(_plugin.main);
             }
+            if(_plugin.namespace && _plugin.components) {
+                zn.path(window, _plugin.namespace, _plugin.components);
+            }
             var _routes = this._matcher.formatRoutes(_plugin.routes||[]);
             _plugin.__routes__ = _routes;
+            this._plugins.push(_plugin);
             this.fire('pluginLoaded', _plugin);
             return this._routes = this._routes.concat(_routes), _routes;
         },

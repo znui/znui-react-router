@@ -1,5 +1,7 @@
 "use strict";
 
+function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
+
 var React = znui.React || require('react');
 
 var HashHandler = require('./HashHandler');
@@ -10,6 +12,7 @@ module.exports = React.createClass({
   displayName: 'ZRHashRouter',
   getInitialState: function getInitialState() {
     return {
+      component: null,
       Component: null,
       ComponentProps: null
     };
@@ -34,15 +37,22 @@ module.exports = React.createClass({
     this.props.onHandler && this.props.onHandler(event, data, this);
   },
   __request: function __request(sender, request, route) {
-    this.setState({
-      Component: route.component,
-      ComponentProps: zn.extend({}, route.props, {
-        application: this.props.application,
-        request: request,
-        router: this,
-        route: route
-      })
-    });
+    if (route.component && _typeof(route.component) == 'object' && route.component.$$typeof) {
+      this.setState({
+        component: route.component
+      });
+    } else {
+      this.setState({
+        Component: route.component,
+        ComponentProps: zn.extend({}, route.props, {
+          application: this.props.application,
+          request: request,
+          router: this,
+          route: route
+        })
+      });
+    }
+
     this.props.onRequest && this.props.onRequest(request, route, this);
   },
   __notfound: function __notfound(sender, request) {
@@ -66,6 +76,6 @@ module.exports = React.createClass({
     return React.createElement("div", {
       className: znui.react.classname("zr-hash-router", this.props.className),
       style: this.props.style
-    }, this.state.Component && React.createElement(this.state.Component, this.state.ComponentProps));
+    }, this.state.component, this.state.Component && React.createElement(this.state.Component, this.state.ComponentProps));
   }
 });

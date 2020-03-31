@@ -93,6 +93,7 @@ module.exports = zn.Class({
         },
         __loadPathAndComponent: function (path, component, parent){
             var _route = { path: path };
+            
             switch(zn.type(component)){
                 case 'string':
                     _route.component = zn.path(window, component);
@@ -105,9 +106,13 @@ module.exports = zn.Class({
                     }
                     break;
                 case 'object':
-                    zn.extend(_route, component);
-                    if(_route.extension !== false){
-                        this.__initRoute(_route);
+                    if(component.$$typeof) {
+                        _route.component = component;
+                    }else if(component.constructor.toString() == 'function Object() { [native code] }'){
+                        zn.extend(_route, component);
+                        if(_route.extension !== false){
+                            this.__initRoute(_route);
+                        }
                     }
                     break;
             }

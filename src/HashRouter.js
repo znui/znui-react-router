@@ -5,6 +5,7 @@ module.exports = React.createClass({
 	displayName:'ZRHashRouter',
 	getInitialState:function(){
 		return {
+			component: null,
 			Component: null,
 			ComponentProps: null
 		}
@@ -29,15 +30,21 @@ module.exports = React.createClass({
 		this.props.onHandler && this.props.onHandler(event, data, this);
 	},
 	__request: function (sender, request, route){
-		this.setState({
-			Component: route.component,
-			ComponentProps: zn.extend({}, route.props, {
-				application: this.props.application,
-				request: request,
-				router: this,
-				route: route
-			})
-		});
+		if(route.component && typeof route.component == 'object' && route.component.$$typeof) {
+			this.setState({
+				component: route.component
+			});
+		}else{
+			this.setState({
+				Component: route.component,
+				ComponentProps: zn.extend({}, route.props, {
+					application: this.props.application,
+					request: request,
+					router: this,
+					route: route
+				})
+			});
+		}
 		this.props.onRequest && this.props.onRequest(request, route, this);
 	},
 	__notfound: function (sender, request){
@@ -64,7 +71,8 @@ module.exports = React.createClass({
 	render: function(){
 		return (
 			<div className={znui.react.classname("zr-hash-router", this.props.className)} style={this.props.style} >
-				{this.state.Component && <this.state.Component {...this.state.ComponentProps} />}
+				{ this.state.component }
+				{ this.state.Component && <this.state.Component {...this.state.ComponentProps} /> }
 			</div>
 		);
 	}
