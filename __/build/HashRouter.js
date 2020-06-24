@@ -73,9 +73,9 @@ module.exports = React.createClass({
     });
   },
   render: function render() {
-    return React.createElement("div", {
+    return /*#__PURE__*/React.createElement("div", {
       className: znui.react.classname("zr-hash-router", this.props.className),
       style: this.props.style
-    }, this.state.component, this.state.Component && React.createElement(this.state.Component, this.state.ComponentProps));
+    }, this.state.component, this.state.Component && /*#__PURE__*/React.createElement(this.state.Component, this.state.ComponentProps));
   }
 });

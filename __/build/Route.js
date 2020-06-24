@@ -60,10 +60,10 @@ var ZRRoute = React.createClass({
     if (this.props.request && this.props.route && this.props.route.routes) {
       var _Component = this.__getComponent();
 
-      return React.createElement("div", {
+      return /*#__PURE__*/React.createElement("div", {
         className: znui.react.classname("zr-route", this.props.className),
         style: this.props.style
-      }, _Component.Component && React.createElement(_Component.Component, _Component.ComponentProps));
+      }, _Component.Component && /*#__PURE__*/React.createElement(_Component.Component, _Component.ComponentProps));
     } else {
       return null;
     }
