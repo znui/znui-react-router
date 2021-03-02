@@ -108,7 +108,7 @@ module.exports = zn.Class({
                 case 'object':
                     if(component.$$typeof) {
                         _route.component = component;
-                    }else if(component.constructor.toString() == 'function Object() { [native code] }'){
+                    }else if(component.constructor.toString().indexOf('function Object') == 0){
                         zn.extend(_route, component);
                         if(_route.extension !== false){
                             this.__initRoute(_route);
