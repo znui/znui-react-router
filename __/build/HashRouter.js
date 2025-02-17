@@ -1,13 +1,9 @@
 "use strict";
 
-function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
-
+function _typeof(o) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (o) { return typeof o; } : function (o) { return o && "function" == typeof Symbol && o.constructor === Symbol && o !== Symbol.prototype ? "symbol" : typeof o; }, _typeof(o); }
 var React = znui.React || require('react');
-
 var HashHandler = require('./HashHandler');
-
 var error = require('./error/index.js');
-
 module.exports = React.createClass({
   displayName: 'ZRHashRouter',
   getInitialState: function getInitialState() {
@@ -52,7 +48,6 @@ module.exports = React.createClass({
         })
       });
     }
-
     this.props.onRequest && this.props.onRequest(request, route, this);
   },
   __notfound: function __notfound(sender, request) {

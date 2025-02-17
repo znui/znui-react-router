@@ -1,7 +1,6 @@
 "use strict";
 
 var React = znui.React || require('react');
-
 module.exports = React.createClass({
   displayName: 'Error404',
   render: function render() {

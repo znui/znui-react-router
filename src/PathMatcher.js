@@ -41,7 +41,24 @@ module.exports = zn.Class({
                     }
                     return _routes;
                 case 'array':
-                    return routes.map((route)=>this.formatRoute(route, parent));
+                    var _routes = [];
+                    routes.forEach((route)=>{
+                        switch(zn.type(route)){
+                            case 'object':
+                                _routes = _routes.concat(this.formatRoutes(route, parent));
+                                break;
+                            case 'string':
+                                _routes.push(this.__loadPathAndComponent(route, null, parent));
+                                break;
+                            case 'array':
+                                _routes = _routes.concat(this.formatRoutes(route, parent));
+                            default:
+
+                                break;
+                        }    
+                    });
+
+                    return _routes;
                 case 'function':
                     return this.formatRoutes(routes.call(null, parent, this), parent);
             }

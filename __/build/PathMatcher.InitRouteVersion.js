@@ -1,7 +1,6 @@
 "use strict";
 
-function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
-
+function _typeof(o) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (o) { return typeof o; } : function (o) { return o && "function" == typeof Symbol && o.constructor === Symbol && o !== Symbol.prototype ? "symbol" : typeof o; }, _typeof(o); }
 module.exports = zn.Class({
   events: ['pluginLoaded', 'routeLoaded'],
   properties: {
@@ -11,7 +10,6 @@ module.exports = zn.Class({
   methods: {
     init: function init(argv, events) {
       this.__initEvents(events);
-
       this._pathSeparator = argv.pathSeparator || '/';
       this._pathParameterSymbol = argv.pathParameterSymbol || ':';
     },
@@ -26,22 +24,17 @@ module.exports = zn.Class({
       if (parent) {
         route.__parent__ = parent;
       }
-
       route.paths = this.__parseRoutePaths(route.path);
       route.props = zn.extend({}, route.props);
-
       if (route.exact == null) {
         route.exact = true;
       }
-
       this.fire('routeLoaded', route);
       return route;
     },
     formatRoutes: function formatRoutes(routes, parent) {
       var _this = this;
-
       var _routes = [];
-
       if (zn.is(routes, 'object')) {
         for (var path in routes) {
           _routes.push(this.__loadPathAndComponent(path, routes[path], parent));
@@ -53,41 +46,34 @@ module.exports = zn.Class({
       } else if (zn.is(routes, 'function')) {
         return this.formatRoutes(routes.call(this));
       }
-
       return _routes;
     },
     getRouteForRequest: function getRouteForRequest(request, routes) {
       var _routes = routes,
-          _route = null,
-          _data = null;
-
+        _route = null,
+        _data = null;
       for (var i = 0, _len = _routes.length; i < _len; i++) {
         _route = _routes[i];
         _data = this.__matchRouteAndRequest(_route, request);
-
         if (_data) {
           break;
         }
       }
-
       if (!_data || !_route) {
         return;
       }
-
       return request.params = _data, _route;
     },
     __isReactComponent: function __isReactComponent(component) {
       if (component && zn.is(component, 'function') && (component.prototype.render || component.displayName)) {
         return true;
       }
-
       return false;
     },
     __loadPathAndComponent: function __loadPathAndComponent(path, component, parent) {
       var _route = {
         path: path
       };
-
       if (zn.is(component, 'string')) {
         _route.component = zn.path(window, component);
       } else if (zn.is(component, 'function')) {
@@ -98,28 +84,22 @@ module.exports = zn.Class({
         }
       } else if (zn.is(component, 'object')) {
         zn.extend(_route, component);
-
         this.__initRoute(_route);
       }
-
       return this.formatRoute(_route, parent);
     },
     __initRoute: function __initRoute(route) {
       if (route.routes) {
         route.__routes__ = this.formatRoutes(route.routes, route);
       }
-
       if (route.plugins) {
         var _plugins = this.__loadPlugins(route.plugins, route);
-
         route.main = _plugins.main;
-
         if (route.__routes__) {
           route.__routes__ = route.__routes__.concat(_plugins.routes);
         } else {
           route.__routes__ = _plugins.routes;
         }
-
         if (!route.component && _plugins.main.length) {
           route.component = _plugins.main.pop();
         }
@@ -127,36 +107,30 @@ module.exports = zn.Class({
     },
     __loadPlugins: function __loadPlugins(plugins, parent) {
       var _plugins = plugins || [],
-          _plugin = null,
-          _routes = [],
-          _main = [];
-
+        _plugin = null,
+        _routes = [],
+        _main = [];
       switch (zn.type(plugins)) {
         case 'object':
           _plugins = [plugins];
           break;
-
         case 'function':
           _plugins = plugins(this);
           break;
       }
-
       if (_plugins && _plugins.length) {
         plugins.forEach(function (plugin) {
           _plugin = this.__loadPlugin(plugin, parent);
-
           if (_plugin) {
             if (_plugin.__routes__) {
               _routes = _routes.concat(_plugin.__routes__);
             }
-
             if (_plugin.main) {
               _main.push(_plugin.main);
             }
           }
         }.bind(this));
       }
-
       return {
         routes: _routes,
         main: _main
@@ -164,92 +138,73 @@ module.exports = zn.Class({
     },
     __loadPlugin: function __loadPlugin(plugin, parent) {
       var _plugin = plugin || {};
-
       switch (zn.type(plugin)) {
         case 'object':
           _plugin = _plugin;
           break;
-
         case 'function':
           _plugin = _plugin(this);
           break;
       }
-
       if (_plugin.namespace && _plugin.components) {
         zn.path(window, _plugin.namespace, _plugin.components);
       }
-
       _plugin.__routes__ = this.formatRoutes(_plugin.routes || [], parent);
       return this.fire('pluginLoaded', _plugin), _plugin;
     },
     __matchRouteAndRequest: function __matchRouteAndRequest(route, request) {
       var _paths = route.paths,
-          _path = null,
-          _params = {},
-          _urlUnmatchs = [],
-          _hasChecked = false,
-          _temp = null,
-          _temps = request.path.split(this._pathSeparator);
-
+        _path = null,
+        _params = {},
+        _urlUnmatchs = [],
+        _hasChecked = false,
+        _temp = null,
+        _temps = request.path.split(this._pathSeparator);
       if (route.routes && Object.keys(route.routes).length) {
         if (route.exact == null) {
           route.exact = false;
         }
       }
-
       if (route.exact) {
         if (route.path === request.path) {
           return request.unmatchs = _urlUnmatchs, _params;
         }
-
         if (_temps.length !== _paths.length) {
           return false;
         }
       }
-
       for (var i = 0, _len = _temps.length; i < _len; i++) {
         _temp = _temps[i];
-
         if (!_temp) {
           continue;
         }
-
         _path = _paths[i];
         _hasChecked = true;
-
         if (!_path) {
           _urlUnmatchs.push(_temp);
-
           continue;
         }
-
         if (!_path.isParameter && _temp !== _path.key) {
           return false;
         }
-
         if (_path.isParameter) {
           _params[_path.key] = _temp;
         }
       }
-
       if (!_hasChecked) {
         return false;
       }
-
       return request.unmatchs = _urlUnmatchs, _params;
     },
     __parseRoutePaths: function __parseRoutePaths(path) {
       var _paths = [],
-          _temp = null,
-          _temps = path.split(this._pathSeparator);
-
+        _temp = null,
+        _temps = path.split(this._pathSeparator);
       for (var i = 0, _len = _temps.length; i < _len; i++) {
         _temp = _temps[i];
-
         if (!_temp) {
           continue;
         }
-
         if (/^:\w[\w\d]*$/.test(_temp)) {
           _temp = _temp.replace(/^:/, '');
           _paths[i] = {
@@ -262,7 +217,6 @@ module.exports = zn.Class({
           };
         }
       }
-
       return _paths;
     }
   }

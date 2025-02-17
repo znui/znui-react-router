@@ -1,33 +1,27 @@
 "use strict";
 
 var React = znui.React || require('react');
-
 var error = require('./error/index.js');
-
 var ZRRoute = React.createClass({
   displayName: 'ZRRoute',
   __handler: function __handler() {
     var _request = this.props.request,
-        _matcher = _request.matcher,
-        _newRequest = {
-      path: _request.path.replace(this.props.route.path, ''),
-      search: _request.search,
-      event: _request.event,
-      matcher: _matcher
-    },
-        _routes = this.props.route.__routes__,
-        _route = null,
-        _component = null;
-
+      _matcher = _request.matcher,
+      _newRequest = {
+        path: _request.path.replace(this.props.route.path, ''),
+        search: _request.search,
+        event: _request.event,
+        matcher: _matcher
+      },
+      _routes = this.props.route.__routes__,
+      _route = null,
+      _component = null;
     if (!_routes) {
       var _fRoute = _matcher.getRoutesFromRoute(this.props.route);
-
       _routes = _fRoute.routes;
       _component = _fRoute.component;
     }
-
     _route = _matcher.getRouteForRequest(_newRequest, _routes);
-
     if (_route) {
       return {
         Component: _route.component || _component,
@@ -59,7 +53,6 @@ var ZRRoute = React.createClass({
   render: function render() {
     if (this.props.request && this.props.route && this.props.route.routes) {
       var _Component = this.__getComponent();
-
       return /*#__PURE__*/React.createElement("div", {
         className: znui.react.classname("zr-route", this.props.className),
         style: this.props.style
